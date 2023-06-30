@@ -17,20 +17,11 @@ export class ScheduleService {
   options = { headers: this.headers };
 
   save(schedule: ScheduleInterface) {
-    console.log(schedule);
     return this.http.post<ScheduleInterface>(
       `${this.apiUrl}`,
       schedule,
       this.options
     );
-  }
-
-  update(id: number, schedule: ScheduleInterface) {
-    return this.http.put<ScheduleInterface>(`${this.apiUrl}/${id}`, schedule);
-  }
-
-  findById(id: number) {
-    return this.http.get<ScheduleInterface>(`${this.apiUrl}/${id}`);
   }
 
   getAll() {

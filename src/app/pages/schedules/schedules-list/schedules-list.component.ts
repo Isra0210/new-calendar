@@ -19,16 +19,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { parse } from 'date-fns';
-import { Title } from '@angular/platform-browser';
 
 interface CalendarDay {
   number: number;
-}
-
-interface HourEvent {
-  hour: string;
-  event: string;
 }
 
 @Component({
@@ -43,8 +36,7 @@ export class SchedulesListComponent implements OnInit {
     private _overlay: Overlay,
     private _viewContainerRef: ViewContainerRef,
     private toastr: ToastrService,
-    private formBuilder: FormBuilder,
-    private activatedRoute: ActivatedRoute
+    private formBuilder: FormBuilder
   ) {
     this._portal = new TemplatePortal(
       this._dialogTemplate,
@@ -76,6 +68,7 @@ export class SchedulesListComponent implements OnInit {
   weeks: CalendarDay[][] = [];
   selectedDay: number = this.currentDate.getDate();
   events: ScheduleInterface[] = [];
+  filteredEvents: ScheduleInterface[] = [];
   hourList: any[] = [];
 
   scheduleForm: FormGroup = this.formBuilder.group(
@@ -95,10 +88,7 @@ export class SchedulesListComponent implements OnInit {
     this.generateCalendar(this.currentDate);
     this.getSchedules();
     this.streamForms();
-    const { date, initTime } = this.activatedRoute.snapshot.queryParams;
-    if (date && initTime) {
-      this.scheduleForm.patchValue({ date, initTime });
-    }
+    this.filterEventsByMonth();
   }
 
   ngAfterViewInit() {
@@ -121,10 +111,9 @@ export class SchedulesListComponent implements OnInit {
     this._overlayRef.dispose();
   }
 
-  streamForms() {
+  private streamForms() {
     this.scheduleForm.valueChanges.subscribe({
       next: (value) => {
-        console.log();
         this.schedule = {
           date: `${value['date']}`,
           title: value['title'],
@@ -134,7 +123,7 @@ export class SchedulesListComponent implements OnInit {
     });
   }
 
-  getSchedules() {
+  private getSchedules() {
     this.service.getAll().subscribe({
       next: (e) => {
         this.events = e;
@@ -142,12 +131,71 @@ export class SchedulesListComponent implements OnInit {
     });
   }
 
-  deleteSchedule(id: number | any) {
-    this.service.delete(id).subscribe(() => this.getSchedules());
-    this.toastr.warning('Deleted event');
+  addElement(schedule: ScheduleInterface) {
+    const emptyIndex = this.filteredEvents.findIndex(
+      (item) => item.title == ''
+    );
+    if (emptyIndex !== -1) {
+      this.filteredEvents.splice(emptyIndex, 1, schedule);
+    } else {
+      this.filteredEvents.push(schedule);
+    }
   }
 
-  initializeHour() {
+  private filterEventsByMonth() {
+		this.filteredEvents = [];
+    for (let i = 1; i < 24; i++) {
+      this.filteredEvents.push({
+        date: '',
+        time: `${i}:00`,
+        title: '',
+      });
+    }
+    this.service.getAll().subscribe({
+      next: (events) => {
+        events.map((e) => {
+          const date = new Date(e.date);
+          if (date.getMonth() == this.currentMonth) {
+            this.addElement(e);
+          }
+        });
+        this.sortEvents();
+      },
+    });
+  }
+
+  private sortEvents() {
+    this.filteredEvents.sort((a, b) => {
+      if (a.time > b.time) {
+        return 1;
+      }
+
+      if (a.time < b.time) {
+        return -1;
+      }
+
+      return 0;
+    });
+  }
+
+  public deleteSchedule = (id: number | any) => {
+    this.service.delete(id).subscribe(() => this.getSchedules());
+    this.toastr.warning('Deleted event');
+  };
+
+  public onSubmit() {
+    if (this.scheduleForm.valid && this.schedule != null) {
+      this.service.save(this.schedule).subscribe({
+        next: () => {
+          this.toastr.success('Successfully saved');
+          this.getSchedules();
+          this.closeDialog();
+        },
+      });
+    }
+  }
+
+  private initializeHour() {
     this.hourList = [];
     for (let index = 1; index <= 12; index++) {
       this.hourList.push(`${index} AM`);
@@ -158,11 +206,15 @@ export class SchedulesListComponent implements OnInit {
     this.hourList.push('');
   }
 
-  drop(event: CdkDragDrop<any[]>) {
-    moveItemInArray(this.events, event.previousIndex, event.currentIndex);
+  public drop(event: CdkDragDrop<any[]>) {
+    moveItemInArray(
+      this.filteredEvents,
+      event.previousIndex,
+      event.currentIndex
+    );
   }
 
-  isCurrentDay(day: number, isCurrentMonth: boolean): boolean {
+  public isCurrentDay(day: number, isCurrentMonth: boolean): boolean {
     if (!isCurrentMonth) {
       return false;
     }
@@ -178,7 +230,7 @@ export class SchedulesListComponent implements OnInit {
     );
   }
 
-  previousMonth(): void {
+  public previousMonth(): void {
     this.currentDate.setMonth(this.currentDate.getMonth() - 1);
     if (this.currentMonth < 0) {
       this.currentMonth = 11;
@@ -188,10 +240,11 @@ export class SchedulesListComponent implements OnInit {
       month: 'long',
     });
     this.currentYear = this.currentDate.getFullYear();
+    this.filterEventsByMonth();
     this.generateCalendar(this.currentDate);
   }
 
-  nextMonth(): void {
+  public nextMonth(): void {
     this.currentDate.setMonth(this.currentDate.getMonth() + 1);
 
     this.monthName = this.currentDate.toLocaleString('default', {
@@ -199,10 +252,11 @@ export class SchedulesListComponent implements OnInit {
     });
 
     this.currentYear = this.currentDate.getFullYear();
+    this.filterEventsByMonth();
     this.generateCalendar(this.currentDate);
   }
 
-  generateCalendar(currentDate: Date): void {
+  private generateCalendar(currentDate: Date): void {
     this.currentYear = currentDate.getFullYear();
     this.currentMonth = currentDate.getMonth();
     const totalDays = new Date(
@@ -273,11 +327,11 @@ export class SchedulesListComponent implements OnInit {
     }
   }
 
-  updateCurrentDay(day: number) {
+  public updateCurrentDay(day: number) {
     this.selectedDay = day;
   }
 
-  openDialog() {
+  public openDialog() {
     if (!this.isOpenDialog) {
       this.isOpenDialog = true;
       this._overlayRef = this._overlay.create({
@@ -295,35 +349,18 @@ export class SchedulesListComponent implements OnInit {
   }
 
   private dateValidator(control: AbstractControl) {
-    const date = control.get('date')!.value;
+    const date = new Date(control.get('date')!.value);
     const today = new Date();
-
-    if (control.get('date')!.value != '' && date <= today) {
-      return {
-        dateError: 'Invalid date',
-      };
+    if (control.get('date')!.value != '' && date >= today) {
+      return { dateError: 'Invalid date' };
     }
 
     return null;
   }
 
-  closeDialog() {
+  public closeDialog() {
+    this.scheduleForm.reset();
     this.isOpenDialog = false;
     this._overlayRef.dispose();
-  }
-
-  onSubmit() {
-    if (this.scheduleForm.valid && this.schedule != null) {
-      this.service
-        .save(this.schedule)
-        .subscribe({
-          next: () => {
-            this.toastr.success('Successfully saved');
-            this.scheduleForm.reset();
-            this.getSchedules();
-            this.closeDialog();
-          },
-        });
-    }
   }
 }

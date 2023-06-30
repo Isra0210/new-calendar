@@ -115,8 +115,24 @@
     <div class="events-body">
       <table mat-table [dataSource]="hourList" class="hour-table">
         <ng-container matColumnDef="hour">
-          <th mat-header-cell *matHeaderCellDef></th>
-          <td mat-cell *matCellDef="let hourEvent">{{ hourEvent }}</td>
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            [ngStyle]="{
+              'background-color': true ? '#F7F7F7 ' : '#F8F8F8 ',
+              border: 'none'
+            }"
+          ></th>
+          <td
+            mat-cell
+            *matCellDef="let hourEvent"
+            [ngStyle]="{
+              'background-color': true ? '#F7F7F7 ' : '#F7F7F7 ',
+              border: 'none'
+            }"
+          >
+            {{ hourEvent }}
+          </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="['hour']"></tr>
         <tr mat-row *matRowDef="let row; columns: ['hour']"></tr>
@@ -127,12 +143,22 @@
           class="drop-list example-list"
           (cdkDropListDropped)="drop($event)"
         >
-          <div class="example-box" *ngFor="let event of events" cdkDrag>
+          <div
+            class="example-box"
+            *ngFor="let event of filteredEvents"
+            [ngStyle]="{
+              'pointer-events': event.title == '' ? 'none' : 'auto'
+            }"
+            cdkDrag
+          >
             <div class="drag-body">
-              <p class="drag-title-component">{{ event.time }}</p>
+              <p class="drag-title-component">
+                {{ event.title != "" ? event.time : "" }}
+              </p>
               <p class="drag-title-component">{{ event.title }}</p>
               <div class="example-button-container">
                 <button
+                  *ngIf="event.title != ''"
                   mat-mini-fab
                   color="warn"
                   aria-label="Example icon button with a home icon"
