@@ -20,6 +20,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { parse } from 'date-fns';
+import { Title } from '@angular/platform-browser';
 
 interface CalendarDay {
   number: number;
@@ -64,6 +65,7 @@ export class SchedulesListComponent implements OnInit {
   private isOpenDialog: boolean = false;
   private _overlayRef: OverlayRef;
   private _portal: TemplatePortal;
+  private schedule: ScheduleInterface | null = null;
 
   weekdays: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -96,11 +98,8 @@ export class SchedulesListComponent implements OnInit {
     });
     this.initializeHour();
     this.generateCalendar(this.currentDate);
-    this.service.getAll().subscribe({
-      next: (e) => {
-        this.events = e;
-      },
-    });
+    this.getSchedules();
+    this.streamForms();
     const { date, initTime } = this.activatedRoute.snapshot.queryParams;
     if (date && initTime) {
       this.scheduleForm.patchValue({ date, initTime });
@@ -126,6 +125,32 @@ export class SchedulesListComponent implements OnInit {
   ngOnDestroy() {
     this._overlayRef.dispose();
   }
+
+  streamForms() {
+    this.scheduleForm.valueChanges.subscribe({
+      next: (value) => {
+        console.log();
+        this.schedule = {
+          date: value['date'],
+          title: value['title'],
+          time: value['time'],
+        };
+      },
+    });
+  }
+	
+	getSchedules() {
+		this.service.getAll().subscribe({
+      next: (e) => {
+        this.events = e;
+      },
+    });
+	}
+	
+	deleteSchedule(id: number | any) {
+		this.service.delete(id).subscribe(()=>this.getSchedules());
+		this.toastr.warning('Deleted event');
+	}
 
   initializeHour() {
     this.hourList = [];
@@ -293,11 +318,9 @@ export class SchedulesListComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.scheduleForm.valid) {
-      this.toastr.success('Successfully saved', '', {
-        positionClass: 'toast-top-right',
-      });
-      console.log(this.scheduleForm.value);
+    if (this.scheduleForm.valid && this.schedule != null) {
+      this.toastr.success('Successfully saved');
+      this.service.save(this.schedule);
       this.scheduleForm.reset();
       this.closeDialog();
     }

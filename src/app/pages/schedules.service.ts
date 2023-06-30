@@ -1,19 +1,25 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environment/environment';
 import { ScheduleInterface } from './schedules/schedule';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ScheduleService {
-
+  constructor(private http: HttpClient) {}
   private apiUrl = `${environment.apiUrl}/schedules`;
 
-  constructor(private http: HttpClient) { }
+  headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    Authorization: 'Bearer <your-token>',
+  });
+
+  options = { headers: this.headers };
 
   save(schedule: ScheduleInterface) {
-    return this.http.post<ScheduleInterface>(`${this.apiUrl}`, schedule);
+    console.log(schedule);
+    return this.http.post<ScheduleInterface>(`${this.apiUrl}`, schedule, this.options);
   }
 
   update(id: number, schedule: ScheduleInterface) {
@@ -31,5 +37,4 @@ export class ScheduleService {
   delete(id: number) {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
-
 }

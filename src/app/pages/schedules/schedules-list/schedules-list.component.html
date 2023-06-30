@@ -32,7 +32,11 @@
             ></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>
-					<small class="text-danger" *ngIf="scheduleForm.errors?.['dateError']">{{scheduleForm.errors?.['dateError']}}</small>
+          <small
+            class="text-danger"
+            *ngIf="scheduleForm.errors?.['dateError']"
+            >{{scheduleForm.errors?.['dateError']}}</small
+          >
           <input type="time" class="time" formControlName="time" />
 
           <div class="form-footer">
@@ -117,8 +121,20 @@
           (cdkDropListDropped)="drop($event)"
         >
           <div class="example-box" *ngFor="let event of events" cdkDrag>
-            {{ event.title }}
-            {{ event.time }}
+            <div class="drag-body">
+              <p class="drag-title-component">{{ event.time }}</p>
+              <p class="drag-title-component">{{ event.title }}</p>
+              <div class="example-button-container">
+                <button
+                  mat-fab
+                  color="warn"
+                  aria-label="Example icon button with a home icon"
+                  (click)="deleteSchedule(event.id)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
