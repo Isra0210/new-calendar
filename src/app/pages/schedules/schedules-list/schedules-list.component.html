@@ -1,0 +1,70 @@
+<div class="container">
+  <mat-dialog-content
+    cdkDrag
+    cdkDragRootElement=".cdk-overlay-pane"
+    cdkDragHandle
+  >
+    content...
+  </mat-dialog-content>
+  <div class="schedule">
+    <div class="calendar-header">
+      <button mat-raised-button color="basic" (click)="previousMonth()">
+        Previous
+      </button>
+      <span class="current-month">{{ monthName }} {{ currentYear }}</span>
+      <button mat-raised-button color="primary" (click)="nextMonth()">
+        Next
+      </button>
+    </div>
+    <table mat-table [dataSource]="weeks" class="mat-elevation-z8">
+      <ng-container [matColumnDef]="weekday" *ngFor="let weekday of weekdays">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ weekday }}
+        </th>
+        <td
+          (click)="updateCurrentDay(week[weekday].day)"
+          mat-cell
+          *matCellDef="let week"
+          [ngClass]="{
+            'current-day': isCurrentDay(
+              week[weekday].day,
+              week[weekday].isCurrentMonth
+            ),
+            'other-month': !week[weekday].isCurrentMonth
+          }"
+        >
+          {{ week[weekday].day }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="weekdays"></tr>
+      <tr mat-row *matRowDef="let row; columns: weekdays"></tr>
+    </table>
+  </div>
+  <div class="events">
+    <p id="header-day">{{ selectedDay }}</p>
+
+    <div class="events-body">
+      <table mat-table [dataSource]="hourList" class="hour-table">
+        <ng-container matColumnDef="hour">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let hourEvent">{{ hourEvent }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['hour']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['hour']"></tr>
+      </table>
+      <div class="drag-list">
+        <div
+          cdkDropList
+          class="drop-list example-list"
+          (cdkDropListDropped)="drop($event)"
+        >
+          <div class="example-box" *ngFor="let event of events" cdkDrag>
+            {{ event.title }}
+            {{ event.initTime }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+.header {
+	justify-content: end;
+	height: 100px;
+	background-color: #fff;
+}
+
+.image-header {
+	height: 80px;
+	margin: 16px;
+}

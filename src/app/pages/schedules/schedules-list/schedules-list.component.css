@@ -1,0 +1,128 @@
+td,
+th {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  /* border: 1px solid #ccc; */
+  padding: 25px;
+}
+
+.container {
+  display: flex;
+  align-items: start;
+  margin: 20px;
+  justify-content: space-between;
+}
+
+.schedule {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  flex-direction: column;
+  margin-right: 20px;
+}
+
+.events {
+  flex: 1;
+  align-items: start;
+  justify-content: start;
+  margin-left: 20px;
+  margin-top: 10px;
+}
+
+.events-body {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 76vh;
+  overflow: scroll;
+  margin-top: 28px;
+}
+
+p#header-day {
+  font-size: 40px;
+  color: #000;
+}
+
+table.hour-table {
+  min-width: 60px;
+  border: none;
+}
+
+.drop-list {
+  width: 100%;
+}
+
+.current-day {
+  background-color: rgb(234, 231, 231);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.current-month {
+  font-size: 24px;
+  margin: 0 20px;
+}
+
+.drag-list {
+  margin-top: 56px;
+}
+
+.example-list {
+  width: 46vw;
+  border: solid 1px #ccc;
+  display: block;
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.example-box {
+  min-height: 90px;
+	max-height: 90px;
+  border-bottom: solid 1px #ccc;
+  color: rgba(0, 0, 0, 0.87);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  cursor: move;
+  background: white;
+  font-size: 14px;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.example-box:last-child {
+  border: none;
+}
+
+.example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

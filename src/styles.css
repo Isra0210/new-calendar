@@ -1,0 +1,9 @@
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body {
+	background-color: rgb(247, 247, 247);
+}
+
+p, h1, h2, h3, h4, h5, label, small {
+	color: white;
+}
