@@ -100,9 +100,16 @@
   <div class="events">
     <div class="header-events">
       <p id="header-day">{{ selectedDay }}</p>
-      <button mat-raised-button color="primary" (click)="openDialog()">
-        Add
-      </button>
+      <div class="example-button-container">
+        <button
+          mat-fab
+          color="primary"
+          aria-label="Example icon button with a home icon"
+          (click)="openDialog()"
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
     </div>
 
     <div class="events-body">
@@ -126,7 +133,7 @@
               <p class="drag-title-component">{{ event.title }}</p>
               <div class="example-button-container">
                 <button
-                  mat-fab
+                  mat-mini-fab
                   color="warn"
                   aria-label="Example icon button with a home icon"
                   (click)="deleteSchedule(event.id)"

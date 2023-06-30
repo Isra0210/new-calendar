@@ -77,11 +77,6 @@ export class SchedulesListComponent implements OnInit {
   selectedDay: number = this.currentDate.getDate();
   events: ScheduleInterface[] = [];
   hourList: any[] = [];
-  hourEvents: HourEvent[] = [
-    { hour: '12:00am', event: 'Event 1' },
-    { hour: '01:00am', event: 'Event 2' },
-    { hour: '02:00am', event: 'Event 3' },
-  ];
 
   scheduleForm: FormGroup = this.formBuilder.group(
     {
@@ -131,26 +126,26 @@ export class SchedulesListComponent implements OnInit {
       next: (value) => {
         console.log();
         this.schedule = {
-          date: value['date'],
+          date: `${value['date']}`,
           title: value['title'],
           time: value['time'],
         };
       },
     });
   }
-	
-	getSchedules() {
-		this.service.getAll().subscribe({
+
+  getSchedules() {
+    this.service.getAll().subscribe({
       next: (e) => {
         this.events = e;
       },
     });
-	}
-	
-	deleteSchedule(id: number | any) {
-		this.service.delete(id).subscribe(()=>this.getSchedules());
-		this.toastr.warning('Deleted event');
-	}
+  }
+
+  deleteSchedule(id: number | any) {
+    this.service.delete(id).subscribe(() => this.getSchedules());
+    this.toastr.warning('Deleted event');
+  }
 
   initializeHour() {
     this.hourList = [];
@@ -164,7 +159,7 @@ export class SchedulesListComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<any[]>) {
-    moveItemInArray(this.hourEvents, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.events, event.previousIndex, event.currentIndex);
   }
 
   isCurrentDay(day: number, isCurrentMonth: boolean): boolean {
@@ -319,10 +314,16 @@ export class SchedulesListComponent implements OnInit {
 
   onSubmit() {
     if (this.scheduleForm.valid && this.schedule != null) {
-      this.toastr.success('Successfully saved');
-      this.service.save(this.schedule);
-      this.scheduleForm.reset();
-      this.closeDialog();
+      this.service
+        .save(this.schedule)
+        .subscribe({
+          next: () => {
+            this.toastr.success('Successfully saved');
+            this.scheduleForm.reset();
+            this.getSchedules();
+            this.closeDialog();
+          },
+        });
     }
   }
 }

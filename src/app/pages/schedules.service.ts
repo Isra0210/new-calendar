@@ -12,14 +12,17 @@ export class ScheduleService {
 
   headers = new HttpHeaders({
     'Content-Type': 'application/json',
-    Authorization: 'Bearer <your-token>',
   });
 
   options = { headers: this.headers };
 
   save(schedule: ScheduleInterface) {
     console.log(schedule);
-    return this.http.post<ScheduleInterface>(`${this.apiUrl}`, schedule, this.options);
+    return this.http.post<ScheduleInterface>(
+      `${this.apiUrl}`,
+      schedule,
+      this.options
+    );
   }
 
   update(id: number, schedule: ScheduleInterface) {
