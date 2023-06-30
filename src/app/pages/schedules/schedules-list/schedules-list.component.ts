@@ -1,30 +1,25 @@
 import {
-  AfterViewInit,
   Component,
-  OnDestroy,
   OnInit,
   TemplateRef,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
+import { ScheduleInterface } from '../schedule';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ScheduleService } from '../../schedules.service';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { TemplatePortal } from '@angular/cdk/portal';
+import { ToastrService } from 'ngx-toastr';
 import {
   AbstractControl,
   FormBuilder,
+  FormControl,
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { parse } from 'date-fns';
-import { ScheduleInterface } from '../schedule';
-import {
-  CdkDragDrop,
-  CdkDropList,
-  CdkDrag,
-  moveItemInArray,
-} from '@angular/cdk/drag-drop';
-import {TemplatePortal} from '@angular/cdk/portal';
-import { ScheduleService } from '../../schedules.service';
-import { Overlay, OverlayRef, ToastrService } from 'ngx-toastr';
-import { MatDialog } from '@angular/material/dialog';
 
 interface CalendarDay {
   number: number;
@@ -39,22 +34,38 @@ interface HourEvent {
   selector: 'app-schedules-list',
   templateUrl: './schedules-list.component.html',
   styleUrls: ['./schedules-list.component.css'],
+  template: '<form-component></form-component>',
 })
-export class SchedulesListComponent
-  implements OnInit
-{
+export class SchedulesListComponent implements OnInit {
   constructor(
-    private formBuilder: FormBuilder,
     private service: ScheduleService,
-    private toastr: ToastrService,
     private _overlay: Overlay,
     private _viewContainerRef: ViewContainerRef,
-		private dialog: MatDialog,
-  ) {}
+    private toastr: ToastrService,
+    private formBuilder: FormBuilder,
+    private activatedRoute: ActivatedRoute
+  ) {
+    this._portal = new TemplatePortal(
+      this._dialogTemplate,
+      this._viewContainerRef
+    );
+    this._overlayRef = this._overlay.create({
+      positionStrategy: this._overlay
+        .position()
+        .global()
+        .centerHorizontally()
+        .centerVertically(),
+      hasBackdrop: true,
+    });
+    this._overlayRef.backdropClick().subscribe(() => this._overlayRef.detach());
+  }
 
   @ViewChild(TemplateRef) _dialogTemplate: TemplateRef<any> | any;
-  private _overlayRef: OverlayRef | any;
-  private _portal: TemplatePortal | any;
+  private isOpenDialog: boolean = false;
+  private _overlayRef: OverlayRef;
+  private _portal: TemplatePortal;
+
+  weekdays: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   currentDate = new Date();
   currentYear: number = this.currentDate.getFullYear();
@@ -63,20 +74,20 @@ export class SchedulesListComponent
   weeks: CalendarDay[][] = [];
   selectedDay: number = this.currentDate.getDate();
   events: ScheduleInterface[] = [];
-
-  weekdays: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   hourList: any[] = [];
-  calendar: number[][] = [];
+  hourEvents: HourEvent[] = [
+    { hour: '12:00am', event: 'Event 1' },
+    { hour: '01:00am', event: 'Event 2' },
+    { hour: '02:00am', event: 'Event 3' },
+  ];
 
   scheduleForm: FormGroup = this.formBuilder.group(
     {
-      title: [null, Validators.required],
-      date: [null, Validators.required],
-      initTime: [null, Validators.required],
-      endTime: [null, Validators.required],
-      description: [null],
+      title: ['', [Validators.required]],
+      date: ['', [Validators.required]],
+      time: ['', [Validators.required]],
     },
-    { validators: [this.endTimeValidator, this.dateValidator] }
+    { validators: this.dateValidator }
   );
 
   ngOnInit(): void {
@@ -90,22 +101,31 @@ export class SchedulesListComponent
         this.events = e;
       },
     });
+    const { date, initTime } = this.activatedRoute.snapshot.queryParams;
+    if (date && initTime) {
+      this.scheduleForm.patchValue({ date, initTime });
+    }
   }
 
-  // openDialog() {
-  //   const dialogRef = this.dialog.open(DraggableDialogComponent, {
-  //     disableClose: true,
-  //   });
+  ngAfterViewInit() {
+    this._portal = new TemplatePortal(
+      this._dialogTemplate,
+      this._viewContainerRef
+    );
+    this._overlayRef = this._overlay.create({
+      positionStrategy: this._overlay
+        .position()
+        .global()
+        .centerHorizontally()
+        .centerVertically(),
+      hasBackdrop: true,
+    });
+    this._overlayRef.backdropClick().subscribe(() => this._overlayRef.detach());
+  }
 
-  //   // Set the draggable behavior for the dialog
-  //   const dialogRootElement = dialogRef.componentInstance?.dialogRef?.nativeElement;
-  //   if (dialogRootElement) {
-  //     dialogRef.componentInstance.dialogRef.disableClose = true;
-  //     dialogRef.componentInstance.dialogRef.updateSize({ width: '300px', height: 'auto' });
-  //     dialogRef.componentInstance.dialogRef.addPanelClass('dialog-container');
-  //     dialogRef.componentInstance.dialogRef.backdropClick().subscribe(() => dialogRef.close());
-  //   }
-  // }
+  ngOnDestroy() {
+    this._overlayRef.dispose();
+  }
 
   initializeHour() {
     this.hourList = [];
@@ -117,13 +137,6 @@ export class SchedulesListComponent
     }
     this.hourList.push('');
   }
-
-  hourEvents: HourEvent[] = [
-    { hour: '12:00am', event: 'Event 1' },
-    { hour: '01:00am', event: 'Event 2' },
-    { hour: '02:00am', event: 'Event 3' },
-    // Add more hour events here
-  ];
 
   drop(event: CdkDragDrop<any[]>) {
     moveItemInArray(this.hourEvents, event.previousIndex, event.currentIndex);
@@ -240,24 +253,32 @@ export class SchedulesListComponent
     }
   }
 
-  private endTimeValidator(control: AbstractControl) {
-    const initTime = parse(control.get('initTime')?.value, 'HH:mm', Date.now());
-    const endTime = parse(control.get('endTime')?.value, 'HH:mm', Date.now());
+  updateCurrentDay(day: number) {
+    this.selectedDay = day;
+  }
 
-    if (initTime >= endTime) {
-      return {
-        timeError: 'The end hour must be greater than initial hour.',
-      };
+  openDialog() {
+    if (!this.isOpenDialog) {
+      this.isOpenDialog = true;
+      this._overlayRef = this._overlay.create({
+        positionStrategy: this._overlay
+          .position()
+          .global()
+          .centerHorizontally()
+          .centerVertically(),
+        hasBackdrop: true,
+      });
+      this._overlayRef.attach(
+        new TemplatePortal(this._dialogTemplate, this._viewContainerRef)
+      );
     }
-
-    return null;
   }
 
   private dateValidator(control: AbstractControl) {
-    const date = parse(control.get('date')?.value, 'HH:mm', Date.now());
+    const date = control.get('date')!.value;
     const today = new Date();
 
-    if (date < today) {
+    if (control.get('date')!.value != '' && date <= today) {
       return {
         dateError: 'Invalid date',
       };
@@ -266,7 +287,19 @@ export class SchedulesListComponent
     return null;
   }
 
-  updateCurrentDay(day: number) {
-    this.selectedDay = day;
+  closeDialog() {
+    this.isOpenDialog = false;
+    this._overlayRef.dispose();
+  }
+
+  onSubmit() {
+    if (this.scheduleForm.valid) {
+      this.toastr.success('Successfully saved', '', {
+        positionClass: 'toast-top-right',
+      });
+      console.log(this.scheduleForm.value);
+      this.scheduleForm.reset();
+      this.closeDialog();
+    }
   }
 }

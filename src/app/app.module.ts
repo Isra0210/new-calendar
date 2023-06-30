@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
 import { ToastrModule } from 'ngx-toastr';
+import { SchedulesModule } from './pages/schedules/schedules.module';
 
 const toastrConfig = {
   maxOpened: 1,
@@ -25,6 +26,7 @@ const toastrConfig = {
     BrowserAnimationsModule,
     AppRoutingModule,
     CoreModule,
+		SchedulesModule,
 		ToastrModule.forRoot(toastrConfig)
   ],
   providers: [],

@@ -37,11 +37,16 @@ table td {
   margin-top: 10px;
 }
 
+.header-events {
+  display: flex;
+  justify-content: space-between;
+}
+
 .events-body {
   display: flex;
   flex: 1;
   width: 100%;
-  height: 76vh;
+  height: 70vh;
   overflow: scroll;
   margin-top: 28px;
 }
@@ -91,7 +96,7 @@ table.hour-table {
 
 .example-box {
   min-height: 90px;
-	max-height: 90px;
+  max-height: 90px;
   border-bottom: solid 1px #ccc;
   color: rgba(0, 0, 0, 0.87);
   display: flex;
@@ -125,4 +130,71 @@ table.hour-table {
 
 .example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+
+.example-dialog-content {
+  width: 40vw;
+  height: 400px;
+  border: solid 1px #ccc;
+  margin: auto;
+  cursor: move;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  transition: box-shadow 200ms cubic-bezier(0, 0, 0.2, 1);
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.example-dialog-content:active {
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+h1#form-title {
+  margin-top: 20px;
+  color: #000;
+}
+
+.time {
+  height: 40px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+	margin-top: 10px;
+}
+
+.form-body {
+  padding: 22px;
+  padding-right: 22px;
+  width: 40vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-footer {
+  display: flex;
+	margin-top: 10px;
+}
+
+.save-button {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.close-button {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.text-danger{
+	color: red;
 }

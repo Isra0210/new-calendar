@@ -1,11 +1,63 @@
 <div class="container">
-  <mat-dialog-content
-    cdkDrag
-    cdkDragRootElement=".cdk-overlay-pane"
-    cdkDragHandle
-  >
-    content...
-  </mat-dialog-content>
+  <ng-template>
+    <div class="overlay">
+      <div
+        class="example-dialog-content form-body"
+        cdkDrag
+        cdkDragRootElement=".cdk-overlay-pane"
+      >
+        <h1 id="form-title">New event</h1>
+
+        <form
+          class="form-body"
+          [formGroup]="scheduleForm"
+          (ngSubmit)="onSubmit()"
+        >
+          <mat-form-field>
+            <mat-label>Title</mat-label>
+            <input matInput formControlName="title" name="title" />
+          </mat-form-field>
+
+          <mat-form-field>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              placeholder="Select a date"
+              formControlName="date"
+              name="selectedDate"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+					<small class="text-danger" *ngIf="scheduleForm.errors?.['dateError']">{{scheduleForm.errors?.['dateError']}}</small>
+          <input type="time" class="time" formControlName="time" />
+
+          <div class="form-footer">
+            <button
+              class="close-button"
+              mat-raised-button
+              (click)="closeDialog()"
+            >
+              Back
+            </button>
+            <button
+              class="save-button"
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="!scheduleForm.valid"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-template>
+
   <div class="schedule">
     <div class="calendar-header">
       <button mat-raised-button color="basic" (click)="previousMonth()">
@@ -42,7 +94,12 @@
     </table>
   </div>
   <div class="events">
-    <p id="header-day">{{ selectedDay }}</p>
+    <div class="header-events">
+      <p id="header-day">{{ selectedDay }}</p>
+      <button mat-raised-button color="primary" (click)="openDialog()">
+        Add
+      </button>
+    </div>
 
     <div class="events-body">
       <table mat-table [dataSource]="hourList" class="hour-table">
@@ -61,7 +118,7 @@
         >
           <div class="example-box" *ngFor="let event of events" cdkDrag>
             {{ event.title }}
-            {{ event.initTime }}
+            {{ event.time }}
           </div>
         </div>
       </div>
