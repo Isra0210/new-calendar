@@ -1,3 +1,4 @@
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
 <div class="container">
   <ng-template>
     <div class="overlay">
@@ -86,6 +87,7 @@
         <th mat-header-cell *matHeaderCellDef>
           {{ weekday }}
         </th>
+        <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events -->
         <td
           (click)="updateCurrentDay(week[weekday].day)"
           mat-cell
@@ -156,18 +158,18 @@
             class="example-box"
             *ngFor="let event of filteredEvents"
             [ngStyle]="{
-              'pointer-events': event.title == '' ? 'none' : 'auto'
+              'pointer-events': event.title === '' ? 'none' : 'auto'
             }"
             cdkDrag
           >
             <div class="drag-body">
               <p class="drag-title-component">
-                {{ event.title != "" ? event.time : "" }}
+                {{ event.title !== "" ? event.time : "" }}
               </p>
               <p class="drag-title-component">{{ event.title }}</p>
               <div class="example-button-container">
                 <button
-                  *ngIf="event.title != ''"
+                  *ngIf="event.title !== ''"
                   mat-mini-fab
                   color="warn"
                   aria-label="Example icon button with a home icon"

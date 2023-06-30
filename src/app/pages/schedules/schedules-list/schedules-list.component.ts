@@ -1,5 +1,7 @@
 import {
+  AfterViewInit,
   Component,
+  OnDestroy,
   OnInit,
   TemplateRef,
   ViewChild,
@@ -28,7 +30,9 @@ interface CalendarDay {
   styleUrls: ['./schedules-list.component.css'],
   template: '<form-component></form-component>',
 })
-export class SchedulesListComponent implements OnInit {
+export class SchedulesListComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   constructor(
     private service: ScheduleService,
     private _overlay: Overlay,
@@ -52,7 +56,7 @@ export class SchedulesListComponent implements OnInit {
   }
 
   @ViewChild(TemplateRef) _dialogTemplate: TemplateRef<any> | any;
-  private isOpenDialog: boolean = false;
+  private isOpenDialog = false;
   private _overlayRef: OverlayRef;
   private _portal: TemplatePortal;
   private schedule: ScheduleInterface | null = null;
@@ -62,10 +66,11 @@ export class SchedulesListComponent implements OnInit {
   currentDate = new Date();
   currentYear: number = this.currentDate.getFullYear();
   currentMonth: number = this.currentDate.getMonth();
-  monthName: string = '';
+  monthName = '';
   weeks: CalendarDay[][] = [];
   selectedDay: number = this.currentDate.getDate();
   filteredEvents: ScheduleInterface[] = [];
+
   hourList: any[] = [];
 
   scheduleForm: FormGroup = this.formBuilder.group(
@@ -196,7 +201,7 @@ export class SchedulesListComponent implements OnInit {
   }
 
   public drop(event: CdkDragDrop<any[]>) {
-    var cast: any = {
+    const cast: any = {
       13: '1:00 PM',
       14: '2:00 PM',
       15: '3:00 PM',
@@ -288,8 +293,8 @@ export class SchedulesListComponent implements OnInit {
       0
     ).getDate();
 
-    let days: number[] = [];
-    let previousMonthDays: number[] = [];
+    const days: number[] = [];
+    const previousMonthDays: number[] = [];
 
     for (let i = 1; i <= totalDays; i++) {
       days.push(i);
@@ -362,8 +367,8 @@ export class SchedulesListComponent implements OnInit {
   }
 
   private dateValidator(control: AbstractControl) {
-    const date = new Date(control.get('date')!.value);
-    var today = new Date();
+    const date = new Date(control.get('date')?.value);
+    const today = new Date();
     today.setDate(today.getDate() - 1);
     if (date < today) {
       return { dateError: 'Invalid date' };

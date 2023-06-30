@@ -3,38 +3,44 @@
     {
       "title": "Let's win the world",
       "date": "Thu Jun 29 2023 00:00:00 GMT-0300 (Hora padrão de Brasília)0",
-      "time": "1:00",
+      "time": "5:00 PM",
       "id": 1
     },
     {
       "title": "Faith that I will pass the test",
       "date": "Thu Jun 30 2023 00:00:00 GMT-0300 (Hora padrão de Brasília)",
-      "time": "2:00",
+      "time": "2:00 AM",
       "id": 2
     },
     {
       "title": "We are together",
       "date": "Thu Jul 29 2023 00:00:00 GMT-0300 (Hora padrão de Brasília)",
-      "time": "4:00",
+      "time": "4:00 AM",
       "id": 3
     },
     {
       "date": "Fri Jun 30 2023 00:00:00 GMT-0300 (Hora padrão de Brasília)",
-      "title": "das",
-      "time": "16:14",
+      "title": "baatata",
+      "time": "8:00 PM",
+      "id": 4
+    },
+    {
+      "date": "Fri Jun 30 2023 00:00:00 GMT-0300 (Hora padrão de Brasília)",
+      "title": "teste",
+      "time": "2:00 AM",
+      "id": 5
+    },
+    {
+      "date": "Fri Jun 30 2023 00:00:00 GMT-0300 (Hora padrão de Brasília)",
+      "title": "dsdasddas",
+      "time": "3 AM",
       "id": 6
     },
     {
       "date": "Fri Jun 30 2023 00:00:00 GMT-0300 (Hora padrão de Brasília)",
-      "title": "sadadas",
-      "time": "15:32",
+      "title": "b",
+      "time": "3:00 AM",
       "id": 7
-    },
-    {
-      "date": "Fri Jun 30 2023 00:00:00 GMT-0300 (Hora padrão de Brasília)",
-      "title": "new elemnt",
-      "time": "16:34",
-      "id": 8
     }
   ]
 }
