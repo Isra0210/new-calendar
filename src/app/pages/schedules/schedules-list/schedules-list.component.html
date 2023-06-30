@@ -32,12 +32,21 @@
             ></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>
-          <small
+
+          <mat-form-field>
+            <mat-label>Select time</mat-label>
+            <mat-select formControlName="time">
+              <mat-option *ngFor="let hour of hourList" [value]="hour">
+                {{ hour }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+					
+					<small
             class="text-danger"
             *ngIf="scheduleForm.errors?.['dateError']"
             >{{scheduleForm.errors?.['dateError']}}</small
           >
-          <input type="time" class="time" formControlName="time" />
 
           <div class="form-footer">
             <button

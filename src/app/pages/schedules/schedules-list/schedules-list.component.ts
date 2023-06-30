@@ -18,7 +18,6 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 
 interface CalendarDay {
   number: number;
@@ -67,7 +66,6 @@ export class SchedulesListComponent implements OnInit {
   monthName: string = '';
   weeks: CalendarDay[][] = [];
   selectedDay: number = this.currentDate.getDate();
-  events: ScheduleInterface[] = [];
   filteredEvents: ScheduleInterface[] = [];
   hourList: any[] = [];
 
@@ -86,7 +84,6 @@ export class SchedulesListComponent implements OnInit {
     });
     this.initializeHour();
     this.generateCalendar(this.currentDate);
-    this.getSchedules();
     this.streamForms();
     this.filterEventsByMonth();
   }
@@ -123,14 +120,6 @@ export class SchedulesListComponent implements OnInit {
     });
   }
 
-  private getSchedules() {
-    this.service.getAll().subscribe({
-      next: (e) => {
-        this.events = e;
-      },
-    });
-  }
-
   addElement(schedule: ScheduleInterface) {
     const emptyIndex = this.filteredEvents.findIndex(
       (item) => item.title == ''
@@ -159,9 +148,9 @@ export class SchedulesListComponent implements OnInit {
             this.addElement(e);
           }
         });
-        this.sortEvents();
       },
     });
+		this.sortEvents();
   }
 
   private sortEvents() {
@@ -179,7 +168,7 @@ export class SchedulesListComponent implements OnInit {
   }
 
   public deleteSchedule = (id: number | any) => {
-    this.service.delete(id).subscribe(() => this.getSchedules());
+    this.service.delete(id).subscribe(() => this.filterEventsByMonth());
     this.toastr.warning('Deleted event');
   };
 
@@ -188,7 +177,8 @@ export class SchedulesListComponent implements OnInit {
       this.service.save(this.schedule).subscribe({
         next: () => {
           this.toastr.success('Successfully saved');
-          this.getSchedules();
+          this.filterEventsByMonth();
+					this.sortEvents();
           this.closeDialog();
         },
       });
@@ -203,7 +193,6 @@ export class SchedulesListComponent implements OnInit {
     for (let index = 1; index < 12; index++) {
       this.hourList.push(`${index} PM`);
     }
-    this.hourList.push('');
   }
 
   public drop(event: CdkDragDrop<any[]>) {
@@ -350,11 +339,11 @@ export class SchedulesListComponent implements OnInit {
 
   private dateValidator(control: AbstractControl) {
     const date = new Date(control.get('date')!.value);
-    const today = new Date();
-    if (control.get('date')!.value != '' && date >= today) {
+    var today = new Date();
+		today.setDate(today.getDate() - 1);
+    if (date < today) {
       return { dateError: 'Invalid date' };
     }
-
     return null;
   }
 
