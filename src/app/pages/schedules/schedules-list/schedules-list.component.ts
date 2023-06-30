@@ -14,7 +14,6 @@ import { ToastrService } from 'ngx-toastr';
 import {
   AbstractControl,
   FormBuilder,
-  FormControl,
   FormGroup,
   Validators,
 } from '@angular/forms';
@@ -129,10 +128,11 @@ export class SchedulesListComponent implements OnInit {
     } else {
       this.filteredEvents.push(schedule);
     }
+    this.sortEvents();
   }
 
   private filterEventsByMonth() {
-		this.filteredEvents = [];
+    this.filteredEvents = [];
     for (let i = 1; i < 24; i++) {
       this.filteredEvents.push({
         date: '',
@@ -150,7 +150,7 @@ export class SchedulesListComponent implements OnInit {
         });
       },
     });
-		this.sortEvents();
+    this.sortEvents();
   }
 
   private sortEvents() {
@@ -178,7 +178,7 @@ export class SchedulesListComponent implements OnInit {
         next: () => {
           this.toastr.success('Successfully saved');
           this.filterEventsByMonth();
-					this.sortEvents();
+          this.sortEvents();
           this.closeDialog();
         },
       });
@@ -196,6 +196,30 @@ export class SchedulesListComponent implements OnInit {
   }
 
   public drop(event: CdkDragDrop<any[]>) {
+    var cast: any = {
+      13: '1:00 PM',
+      14: '2:00 PM',
+      15: '3:00 PM',
+      16: '4:00 PM',
+      17: '5:00 PM',
+      18: '6:00 PM',
+      19: '7:00 PM',
+      20: '8:00 PM',
+      21: '9:00 PM',
+      22: '10:00 PM',
+      23: '11:00 PM',
+    };
+    this.filteredEvents[event.previousIndex].time =
+      event.currentIndex < 11
+        ? `${event.currentIndex + 1}:00 AM`
+        : `${cast[event.currentIndex + 1]}`;
+
+    this.service
+      .update(this.filteredEvents[event.previousIndex])
+      .subscribe(() => {
+        this.toastr.success('Event updated');
+      });
+
     moveItemInArray(
       this.filteredEvents,
       event.previousIndex,
@@ -340,7 +364,7 @@ export class SchedulesListComponent implements OnInit {
   private dateValidator(control: AbstractControl) {
     const date = new Date(control.get('date')!.value);
     var today = new Date();
-		today.setDate(today.getDate() - 1);
+    today.setDate(today.getDate() - 1);
     if (date < today) {
       return { dateError: 'Invalid date' };
     }

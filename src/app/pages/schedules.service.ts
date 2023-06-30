@@ -23,7 +23,9 @@ export class ScheduleService {
       this.options
     );
   }
-
+  update(schedule: ScheduleInterface) {
+    return this.http.put<ScheduleInterface>(`${this.apiUrl}/${schedule.id}`, schedule);
+  }
   getAll() {
     return this.http.get<ScheduleInterface[]>(`${this.apiUrl}`);
   }
